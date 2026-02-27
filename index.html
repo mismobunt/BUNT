@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BUNT — Borba za Ujedinjenje i Neupitnu Transparentnost</title>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Share+Tech+Mono&family=Anton&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #F0EDE6;
+    --grey: #2A2A2A;
+    --grey2: #1A1A1A;
+    --mid: #555;
+    --faint: rgba(240,237,230,0.08);
+    --border: rgba(240,237,230,0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Special Elite', cursive;
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: crosshair;
+  }
+
+  ::selection { background: var(--white); color: var(--black); }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.68' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.07;
+    mix-blend-mode: overlay;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0,0,0,0.06) 3px,
+      rgba(0,0,0,0.06) 4px
+    );
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  @keyframes glitch {
+    0%,100% { clip-path: inset(0 0 0 0); transform: translate(0,0); }
+    2%  { clip-path: inset(8% 0 85% 0);  transform: translate(-5px, 0); color: rgba(240,237,230,0.9); }
+    4%  { clip-path: inset(55% 0 30% 0); transform: translate(5px, 0); }
+    6%  { clip-path: inset(25% 0 60% 0); transform: translate(-3px, 0); }
+    8%  { clip-path: inset(0 0 0 0);     transform: translate(0,0); }
+    82% { clip-path: inset(0 0 0 0);     transform: translate(0,0); }
+    84% { clip-path: inset(70% 0 15% 0); transform: translate(4px, 0); }
+    86% { clip-path: inset(0 0 0 0);     transform: translate(0,0); }
+  }
+
+  @keyframes glitch-ghost {
+    0%,100% { opacity: 0; transform: translate(0,0); }
+    2%  { opacity: 0.25; transform: translate(6px, 0); clip-path: inset(8% 0 85% 0); }
+    4%  { opacity: 0.15; transform: translate(-6px, 0); clip-path: inset(55% 0 30% 0); }
+    6%  { opacity: 0; }
+    82% { opacity: 0; }
+    84% { opacity: 0.2; transform: translate(-5px, 0); clip-path: inset(70% 0 15% 0); }
+    86% { opacity: 0; }
+  }
+
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 5vw;
+    background: var(--black);
+    border-bottom: 2px solid var(--white);
+  }
+
+  .nav-logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 28px;
+    color: var(--white);
+    text-decoration: none;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    transform: skewX(-4deg);
+    display: inline-block;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.5);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--white); text-decoration: underline; }
+
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 120px 5vw 80px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 2px solid var(--white);
+  }
+
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-8deg);
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(80px, 22vw, 320px);
+    color: rgba(240,237,230,0.03);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 0.05em;
+    user-select: none;
+  }
+
+  .hero-stamp {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.4);
+    border: 1px solid rgba(240,237,230,0.2);
+    padding: 6px 14px;
+    margin-bottom: 32px;
+    width: fit-content;
+    opacity: 0;
+    animation: glitch-in 0.5s ease forwards 0.1s;
+  }
+
+  .hero-title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(42px, 15vw, 200px);
+    line-height: 0.88;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: glitch-in 0.6s ease forwards 0.25s;
+    position: relative;
+  }
+
+  .hero-title .glitch-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    color: var(--white);
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(42px, 15vw, 200px);
+    line-height: 0.88;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    pointer-events: none;
+    animation: glitch-ghost 8s steps(1) infinite;
+  }
+
+  .hero-title.active {
+    animation: glitch-in 0.6s ease forwards 0.25s, glitch 8s steps(1) 1s infinite;
+  }
+
+  .hero-tagline {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    text-transform: lowercase;
+    color: rgba(240,237,230,0.35);
+    margin-top: -28px;
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: glitch-in 0.6s ease forwards 0.38s;
+  }
+
+  .hero-sub {
+    max-width: 580px;
+    font-size: 16px;
+    line-height: 1.7;
+    color: rgba(240,237,230,0.6);
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: glitch-in 0.6s ease forwards 0.4s;
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: glitch-in 0.6s ease forwards 0.55s;
+  }
+
+  .btn-primary {
+    background: var(--white);
+    color: var(--black);
+    text-decoration: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    display: inline-block;
+    transition: background 0.15s, color 0.15s;
+    border: 2px solid var(--white);
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .btn-primary:hover { background: transparent; color: var(--white); }
+
+  .btn-secondary {
+    border: 2px solid rgba(240,237,230,0.35);
+    color: var(--white);
+    text-decoration: none;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 14px 36px;
+    display: inline-block;
+    transition: border-color 0.15s;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .btn-secondary:hover { border-color: var(--white); }
+
+  .hero-corner {
+    position: absolute;
+    right: 5vw;
+    bottom: 80px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: rgba(240,237,230,0.25);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    writing-mode: vertical-rl;
+    opacity: 0;
+    animation: glitch-in 0.6s ease forwards 0.7s;
+  }
+
+  .ticker {
+    background: var(--white);
+    padding: 11px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    border-bottom: 2px solid var(--black);
+  }
+  .ticker-inner {
+    display: inline-flex;
+    animation: ticker 25s linear infinite;
+  }
+  .ticker-item {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--black);
+    padding: 0 40px;
+  }
+  .ticker-item::before {
+    content: '//';
+    margin-right: 40px;
+    opacity: 0.35;
+  }
+
+  section { padding: 90px 5vw; border-bottom: 2px solid var(--white); }
+
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.4);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before { content: '//'; color: rgba(240,237,230,0.2); }
+
+  .section-title {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(48px, 7vw, 96px);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: var(--white);
+    line-height: 0.95;
+    margin-bottom: 28px;
+    position: relative;
+    display: inline-block;
+    filter: url(#stencil);
+  }
+
+  .about { background: var(--grey2); }
+
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 56px;
+  }
+
+  .about-text p { font-size: 16px; color: rgba(240,237,230,0.65); margin-bottom: 20px; }
+  .about-text strong { color: var(--white); }
+
+  .about-quote {
+    border: 2px solid var(--white);
+    padding: 36px;
+    font-size: 18px;
+    color: var(--white);
+    line-height: 1.6;
+    position: relative;
+    transform: rotate(0.8deg);
+  }
+  .about-quote::before {
+    content: '"';
+    font-family: 'Anton', sans-serif;
+    font-size: 120px;
+    color: rgba(240,237,230,0.07);
+    position: absolute;
+    top: -20px;
+    left: 20px;
+    line-height: 1;
+  }
+  .about-quote cite {
+    display: block;
+    margin-top: 20px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: rgba(240,237,230,0.4);
+    font-style: normal;
+  }
+
+  .rights { background: var(--black); }
+  .rights-intro { max-width: 660px; font-size: 16px; color: rgba(240,237,230,0.55); margin-bottom: 56px; }
+
+  .rights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2px;
+    background: var(--white);
+    border: 2px solid var(--white);
+  }
+
+  .right-card { background: var(--black); padding: 36px 32px; transition: background 0.15s; }
+  .right-card:hover { background: var(--grey2); }
+
+  .right-number {
+    font-family: 'Anton', sans-serif;
+    font-size: 72px;
+    color: rgba(240,237,230,0.06);
+    line-height: 1;
+    margin-bottom: 14px;
+    transition: color 0.15s;
+  }
+  .right-card:hover .right-number { color: rgba(240,237,230,0.15); }
+
+  .right-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(240,237,230,0.12);
+  }
+
+  .right-text { font-size: 14px; color: rgba(240,237,230,0.55); line-height: 1.65; }
+
+  .guide { background: var(--grey2); }
+  .guide-intro { max-width: 600px; font-size: 16px; color: rgba(240,237,230,0.55); margin-bottom: 60px; }
+
+  .steps { display: flex; flex-direction: column; }
+
+  .step {
+    display: grid;
+    grid-template-columns: 90px 1fr;
+    gap: 36px;
+    align-items: start;
+    padding: 44px 0;
+    border-top: 1px solid rgba(240,237,230,0.12);
+  }
+  .step:last-child { border-bottom: 1px solid rgba(240,237,230,0.12); }
+
+  .step-num {
+    font-family: 'Anton', sans-serif;
+    font-size: 80px;
+    color: rgba(240,237,230,0.08);
+    line-height: 1;
+    transition: color 0.15s;
+  }
+  .step:hover .step-num { color: rgba(240,237,230,0.25); }
+
+  .step-body h3 {
+    font-family: 'Anton', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--white);
+    margin-bottom: 12px;
+  }
+  .step-body p { font-size: 15px; color: rgba(240,237,230,0.55); max-width: 620px; }
+
+  .step-tag {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.35);
+    border: 1px solid rgba(240,237,230,0.15);
+    padding: 4px 10px;
+  }
+
+  .faq { background: var(--black); }
+  .faq-intro { max-width: 600px; font-size: 16px; color: rgba(240,237,230,0.55); margin-bottom: 56px; }
+  .faq-list { display: flex; flex-direction: column; gap: 2px; max-width: 860px; }
+
+  .faq-item { background: var(--grey2); border: 1px solid rgba(240,237,230,0.08); }
+
+  .faq-q {
+    padding: 22px 28px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    color: var(--white);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    letter-spacing: 0.04em;
+    transition: background 0.15s;
+    border: none;
+    background: transparent;
+    width: 100%;
+    text-align: left;
+  }
+  .faq-q:hover { background: var(--grey); }
+
+  .faq-arrow {
+    font-family: 'Anton', sans-serif;
+    font-size: 24px;
+    color: rgba(240,237,230,0.3);
+    flex-shrink: 0;
+    transition: transform 0.2s, color 0.15s;
+    line-height: 1;
+  }
+  .faq-item.open .faq-arrow { transform: rotate(45deg); color: var(--white); }
+
+  .faq-a {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.2s ease;
+    padding: 0 28px;
+    font-size: 15px;
+    color: rgba(240,237,230,0.55);
+    line-height: 1.75;
+  }
+  .faq-item.open .faq-a {
+    max-height: 400px;
+    padding: 4px 28px 26px;
+    border-top: 1px solid rgba(240,237,230,0.08);
+  }
+
+  .contact { background: var(--grey2); }
+  .contact-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 80px;
+    align-items: start;
+    margin-top: 56px;
+  }
+
+  .contact-info p { font-size: 15px; color: rgba(240,237,230,0.6); margin-bottom: 18px; }
+  .contact-info strong {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.4);
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  .law-ref {
+    margin-top: 36px;
+    padding: 22px 24px;
+    border: 1px solid rgba(240,237,230,0.12);
+    border-left: 3px solid var(--white);
+  }
+  .law-ref-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.3);
+    margin-bottom: 8px;
+  }
+  .law-ref p { font-size: 13px; color: rgba(240,237,230,0.4); font-style: italic; }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 18px; }
+
+  label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(240,237,230,0.4);
+  }
+
+  input, select, textarea {
+    background: var(--black);
+    border: 1px solid rgba(240,237,230,0.12);
+    border-bottom: 2px solid rgba(240,237,230,0.3);
+    color: var(--white);
+    font-family: 'Special Elite', cursive;
+    font-size: 15px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+    -webkit-appearance: none;
+  }
+  select {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23F0EDE6' stroke-width='1.5' opacity='0.4'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+  textarea { resize: vertical; min-height: 120px; }
+  input:focus, select:focus, textarea:focus { border-bottom-color: var(--white); }
+  input::placeholder, textarea::placeholder { color: rgba(240,237,230,0.2); }
+
+  .form-note {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: rgba(240,237,230,0.25);
+    margin-top: 14px;
+    letter-spacing: 0.08em;
+  }
+
+  .submit-btn {
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--white);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 15px 40px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s, color 0.15s;
+    width: 100%;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .submit-btn:hover { background: transparent; color: var(--white); }
+
+  .success-msg {
+    display: none;
+    border: 1px solid rgba(240,237,230,0.3);
+    padding: 18px 22px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--white);
+    margin-top: 12px;
+  }
+
+  footer {
+    background: var(--black);
+    padding: 56px 5vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 28px;
+  }
+
+  .footer-logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 36px;
+    color: var(--white);
+    letter-spacing: 0.1em;
+    transform: skewX(-4deg);
+    display: inline-block;
+  }
+
+  .footer-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: rgba(240,237,230,0.25);
+    letter-spacing: 0.12em;
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  .footer-legal {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: rgba(240,237,230,0.25);
+    letter-spacing: 0.1em;
+    text-align: right;
+    line-height: 1.8;
+    text-transform: uppercase;
+  }
+
+  @keyframes glitch-in {
+    0% { opacity: 0; transform: translateY(16px) skewX(-2deg); }
+    60% { opacity: 1; transform: translateY(-2px) skewX(0.5deg); }
+    100% { opacity: 1; transform: translateY(0) skewX(0); }
+  }
+
+  @keyframes ticker {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @media (max-width: 768px) {
+    .about-grid, .contact-wrap { grid-template-columns: 1fr; gap: 40px; }
+    .step { grid-template-columns: 60px 1fr; gap: 20px; }
+    .step-num { font-size: 56px; }
+    nav .nav-links { display: none; }
+    .about-quote { transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="stencil" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" seed="2" result="noise"/>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+      <feComposite in="displaced" in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+</svg>
+
+<nav>
+  <a href="#" class="nav-logo">BUNT</a>
+  <ul class="nav-links">
+    <li><a href="#pravo">Pravo</a></li>
+    <li><a href="#vodic">Vodič</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#kontakt">Kontakt</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg-text">BUNT</div>
+  <div class="hero-stamp">Borba za Ujedinjenje i Neupitnu Transparentnost</div>
+  <h1 class="hero-title active">
+    Znanje je prvi korak otpora<br>
+    <span class="glitch-layer" aria-hidden="true">Pravo na<br>Informaciju</span>
+  </h1>
+  <p class="hero-sub">
+BUNT okuplja mlade ljude i stvara koherentnu strukturu  za kolektivno djelovanje.
+  </p>
+  <div class="hero-cta">
+    <a href="#vodic" class="btn-primary">Kako podnijeti zahtjev</a>
+    <a href="#faq" class="btn-secondary">Česta pitanja</a>
+  </div>
+  <div class="hero-corner">Zakon o slobodi pristupa informacijama · FBiH · 32/2001</div>
+</section>
+
+<div class="ticker">
+  <div class="ticker-inner">
+    <span class="ticker-item">Rok za odgovor: 15 dana</span>
+    <span class="ticker-item">Prvih 10 stranica besplatno</span>
+    <span class="ticker-item">Ne moraš navoditi razlog</span>
+    <span class="ticker-item">Žalba u roku 8 dana</span>
+    <span class="ticker-item">Organ ne smije tražiti obrazloženje</span>
+    <span class="ticker-item">Ombudsman BiH prima pritužbe</span>
+    <span class="ticker-item">Rok za odgovor: 15 dana</span>
+    <span class="ticker-item">Prvih 10 stranica besplatno</span>
+    <span class="ticker-item">Ne moraš navoditi razlog</span>
+    <span class="ticker-item">Žalba u roku 8 dana</span>
+    <span class="ticker-item">Organ ne smije tražiti obrazloženje</span>
+    <span class="ticker-item">Ombudsman BiH prima pritužbe</span>
+  </div>
+</div>
+
+<section class="about" id="pravo">
+  <p class="section-label">Ko smo</p>
+  <h2 class="section-title">Mi smo<br>BUNT</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p><strong>BUNT</strong> je neformalna grupa mladih građana osnovana s ciljem informisanja i mobiliziranja studenata i građana Bosne i Hercegovine."</p>
+      <p>Bunt počinje tamo gdje i spoznaja: kad naučiš <strong>kako da pitaš, koga da pitaš i šta možeš uraditi kad te ignorišu.</strong></p>
+      <p>Ovdje ćete naći konkretan vodič, uzorak zahtjeva i odgovore na najčešća pitanja. Ako i dalje imate nedoumice, pišite nam.</p>
+    </div>
+    <blockquote class="about-quote">
+      Svaka fizička i pravna osoba ima pravo pristupa informacijama koje su pod kontrolom javnog organa.
+      <cite>Član 4, Zakon o slobodi pristupa informacijama FBiH</cite>
+    </blockquote>
+  </div>
+</section>
+
+<section class="rights">
+  <p class="section-label">Šta zakon garantuje</p>
+  <h2 class="section-title">Vaša prava</h2>
+  <p class="rights-intro">Zakon o slobodi pristupa informacijama (Sl. novine FBiH, br. 32/2001 i 48/11) jasno definiše sljedeće garancije:</p>
+  <div class="rights-grid">
+    <div class="right-card">
+      <div class="right-number">01</div>
+      <div class="right-title">Opće pravo pristupa</div>
+      <p class="right-text">Svaka fizička i pravna osoba može zatražiti bilo koji dokument, podatak ili informaciju u posjedu javnog organa.</p>
+    </div>
+    <div class="right-card">
+      <div class="right-number">02</div>
+      <div class="right-title">Bez obrazloženja</div>
+      <p class="right-text">Javni organ nije ovlašten ispitivati opravdanost zahtjeva. Ne moraš nikome govoriti zašto ti informacija treba.</p>
+    </div>
+    <div class="right-card">
+      <div class="right-number">03</div>
+      <div class="right-title">Rok 15 dana</div>
+      <p class="right-text">Nadležni organ obavezan je odgovoriti u roku od 15 dana. Ako to ne uradi, možeš podnijeti pritužbu ombudsmanu.</p>
+    </div>
+    <div class="right-card">
+      <div class="right-number">04</div>
+      <div class="right-title">Prvih 10 str. besplatno</div>
+      <p class="right-text">Zahtjev se ne plaća. Troškovi umnožavanja naplaćuju se samo od 11. stranice nadalje, po utvrđenoj tarifi.</p>
+    </div>
+    <div class="right-card">
+      <div class="right-number">05</div>
+      <div class="right-title">Pravo na žalbu</div>
+      <p class="right-text">Nezadovoljan odgovorom? Imate 8 dana za prigovor rukovodiocu organa, a potom možete pokrenuti upravni spor.</p>
+    </div>
+    <div class="right-card">
+      <div class="right-number">06</div>
+      <div class="right-title">Vaše lične/osobne informacije</div>
+      <p class="right-text">Imate pravo uvida u vlastite podatke i pravo zahtijevati ispravku netačnih informacija koje o vama vodi javni organ.</p>
+    </div>
+  </div>
+</section>
+
+<section class="guide" id="vodic">
+  <p class="section-label">Korak po korak</p>
+  <h2 class="section-title">Kako podnijeti<br>zahtjev</h2>
+  <p class="guide-intro">Postupak je jednostavan i ne zahtijeva pravnu pomoć. Pratite ove korake.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>Identificiraj nadležni organ</h3>
+        <p>Zahtjev podnosiš onom organu za koji smatraš da posjeduje informaciju: ministarstvo, općina, javno preduzeće, sud. Ako pogrešno odabereš, organ je dužan proslijediti zahtjev u roku od 8 dana.</p>
+        <span class="step-tag">// Član 13. Zakona</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>Sačini pismeni zahtjev</h3>
+        <p>Zahtjev mora biti u pisanoj formi na službenom jeziku FBiH. Treba sadržavati tvoje ime, adresu i dovoljno podataka o informaciji. Razlog ne moraš navoditi.</p>
+        <span class="step-tag">// Član 11. Zakona</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>Dostavi službeniku za informiranje</h3>
+        <p>Svaki javni organ ima imenovanog Službenika za informiranje. Zahtjev dostavi lično, poštom ili mailom ako je moguće. Čuvaj potvrdu o predaji.</p>
+        <span class="step-tag">// Član 19. Zakona</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>Čekaj odgovor, rok je 15 dana</h3>
+        <p>Organ je dužan odgovoriti u roku od 15 dana. Ako je zahtjev složeniji, rok može biti produžen. Međutim, organ te mora pisano obavijestiti o razlogu.</p>
+        <span class="step-tag">// Član 14. Zakona</span>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h3>Odbijen si? Reaguj.</h3>
+        <p>Rješenje o odbijanju mora sadržavati pravni osnov i uputu o žalbi. Prigovor rukovodiocu organa podnosi se u roku od 8 dana. Potom: upravni spor ili Ombudsman BiH.</p>
+        <span class="step-tag">// Član 14. st. 4 i 5 · Član 21.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <p class="section-label">Odgovori</p>
+  <h2 class="section-title">Česta pitanja</h2>
+  <p class="faq-intro">Najčešće nedoumice organizatora protesta, aktivista i zainteresovanih građana.</p>
+  <div class="faq-list">
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Mogu li tražiti informacije o odlukama koje se tiču našeg protesta?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Da. Možeš tražiti rješenja, zaključke, dopise, izvještaje. Organ ne može odbiti zahtjev samo zato što se tiče osjetljive tematike. Izuzeci moraju biti precizno obrazloženi u svakom slučaju posebno.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Što ako organ kaže da informacija "ne postoji"?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Organ je dužan to konstatovati pisanim rješenjem. Ako sumitraš da informacija postoji, to je osnov za pritužbu Ombudsmanu BiH koji može pokrenuti istragu i tražiti uvid u dokumentaciju organa.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Može li organ tražiti da kažem zašto mi treba informacija?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Ne. Prema članu 11. stav 4. Zakona, javni organ nije ovlašten ispitivati opravdanost zahtjeva. Ako to traži, radi se o kršenju zakona. Možeš se pozvati na ovu odredbu ili se žaliti Ombudsmanu.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Organizator sam protesta, mogu li tražiti informacije u ime grupe?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Zahtjev mogu podnijeti fizičke i pravne osobe. Ako vaša organizacija ima pravni status, može podnijeti zahtjev u svoje ime. Kao fizičko lice podnosiš zahtjev u svoje ime bez obaveze da navodiš u čijem interesu ili zašto.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Koje informacije se mogu odbiti?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Zakon predviđa tri kategorije izuzetaka: obrana i sigurnost, povjerljive komercijalne informacije i privatnost treće osobe. Čak i tada, organ mora provesti test javnog interesa. Izuzetak se ne primjenjuje automatski i mora biti obrazložen.</div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-q" onclick="toggleFaq(this)">
+        Ko je Ombudsman i čemu se mogu obratiti?
+        <span class="faq-arrow">+</span>
+      </button>
+      <div class="faq-a">Institucija ombudsmana za ljudska prava BiH je nezavisno tijelo koje razmatra pritužbe na rad javnih organa. Može davati preporuke organima i vršiti nadzor. Obraćanje je besplatno.</div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="kontakt">
+  <p class="section-label">Imate pitanje</p>
+  <h2 class="section-title">Pišite nam</h2>
+  <div class="contact-wrap">
+    <div class="contact-info">
+      <p>Ako niste sigurni kako formulisati zahtjev, koji organ je nadležan, ili šta poduzeti ako ste odbijeni, pošaljite nam pitanje. Ekipa BUNT-a odgovara u roku od 48 sati.</p>
+      <p><strong>Za koga smo</strong>Studenti, organizatori protesta, aktivisti, novinari, udruženja i svi zainteresovani građani.</p>
+      <p><strong>Napomena</strong>Ne pružamo pravnu pomoć. Informacije su obrazovne prirode i bazirane su na važećem zakonodavstvu FBiH.</p>
+      <div class="law-ref">
+        <div class="law-ref-label">// Pravni osnov</div>
+        <p>Zakon o slobodi pristupa informacijama u Federaciji BiH, Sl. novine FBiH, br. 32/2001 i 48/11.</p>
+      </div>
+    </div>
+    <form action="https://formspree.io/f/mojnbqzr" method="POST">
+      <div class="form-group">
+        <label for="ime">Ime i prezime</label>
+        <input type="text" id="ime" name="ime" placeholder="Vaše ime" required>
+      </div>
+      <div class="form-group">
+        <label for="email">E-mail adresa</label>
+        <input type="email" id="email" name="email" placeholder="vas@email.com" required>
+      </div>
+      <div class="form-group">
+        <label for="tip">Ko ste?</label>
+        <select id="tip" name="tip">
+          <option value="">Odaberite...</option>
+          <option value="gradjanin">Građanin / Fizičko lice</option>
+          <option value="organizator">Organizator protesta / skupa</option>
+          <option value="aktivist">Aktivist / NVO</option>
+          <option value="novinar">Novinar / Medij</option>
+          <option value="student">Student / Istraživač</option>
+          <option value="ostalo">Ostalo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="pitanje">Vaše pitanje</label>
+        <textarea id="pitanje" name="pitanje" placeholder="Opišite situaciju ili postavite pitanje..." required></textarea>
+      </div>
+      <button type="submit" class="submit-btn">Pošalji pitanje ></button>
+      <p class="form-note">// Vaši podaci neće biti podijeljeni s trećim stranama.</p>
+      <div class="success-msg" id="successMsg">
+        [OK] Pitanje primljeno. Odgovaramo u roku od 48 sati.
+      </div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div>
+    <div class="footer-logo">BUNT</div>
+    <div class="footer-sub">Borba za Ujedinjenje i Neupitnu Transparentnost · Neformalna grupa mladih građana</div>
+  </div>
+  <div class="footer-legal">
+    <p>Zakon o slobodi pristupa informacijama FBiH</p>
+    <p>Sl. novine FBiH, br. 32/2001 i 48/11</p>
+    <p style="margin-top:6px;opacity:0.4;">Platforma ne pruža pravne savjete</p>
+  </div>
+</footer>
+
+<script>
+  function toggleFaq(btn) {
+    const item = btn.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0) skewX(0)';
+      }
+    });
+  }, { threshold: 0.08 });
+
+  document.querySelectorAll('.step, .right-card, .faq-item').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px) skewX(-1deg)';
+    el.style.transition = 'opacity 0.45s ease, transform 0.45s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
+
+
